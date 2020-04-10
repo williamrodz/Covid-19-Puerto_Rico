@@ -19,8 +19,12 @@ import {
   Button,
 } from 'react-native';
 
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+
+import RNFetchBlob from 'rn-fetch-blob'
+const DATA_LAG_DAYS = 1
 
 const BLOCK_WIDTH = 100
 const BLOCK_HEIGHT = 60
@@ -35,14 +39,33 @@ const GO_COLOR = "#2ecc71"
 const STOP_COLOR = "#c0392b"
 
 const DAYS_OF_WEEK_SPANISH = {0:"domingo",1:"lunes",2:"martes",3:"miércoles",4:"jueves",5:"viernes",6:"sábado"}
+const SAMPLE_DATA_URL =  "https://raw.githubusercontent.com/Code4PuertoRico/covid19-pr-api/master/data/PuertoRicoTaskForce/4-07-2020/CSV/resumen.csv"
+const COVID_DATA_URL_PREFIX = "https://raw.githubusercontent.com/Code4PuertoRico/covid19-pr-api/master/data/PuertoRicoTaskForce/"
+const CSV_URL_SUFFIX = "/CSV/resumen.csv"
 
+function getLastXDaysCode(numDays){
+  days = []
+  for (var i = 0; i < numDays; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - (i+DATA_LAG_DAYS));
+    console.log(`${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`)
+    days.push({month:d.getMonth()+1,day:d.getDate(),year:d.getFullYear()})
+  }
+  return days
 
+}
+
+function getTwoDigitNumber(number){
+  if (number < 10){
+    return `0${number}`
+  }
+}
 
 export default class Home extends React.Component{
   constructor(props){
     super(props)
     this.state = {canDriveToday:true,evenLicensePlate:null,
-      deceased:0,infected:0,recovered:0,updateSettingsFunc:this.updateSettings}
+      deceased:0,positiveToday:0,recovered:0,updateSettingsFunc:this.updateSettings}
   }
 
   updateSettings = (newState) =>{
@@ -59,10 +82,56 @@ export default class Home extends React.Component{
 
   }
 
+  getCOVID19DataForLastXDays = async (numDays) => {
+    const days = getLastXDaysCode(numDays)
+    var dataForDays = []
+    for (var i = 0; i < days.length; i++) {
+      dataForDays.push(this.getCOVIDDataForDay(days[i]))
+    }
+    return Promise.all(dataForDays)
 
-  componentDidMount (){
+  }
 
+  getCOVIDDataForDay = async (dayObject) =>{
+    const day = getTwoDigitNumber(dayObject.day)
+    const month = dayObject.month
+    const year = dayObject.year
 
+    console.log(`Getting data for ${month}-${day}-${year}`)
+
+    const url = COVID_DATA_URL_PREFIX+`${month}-${day}-${year}` + CSV_URL_SUFFIX
+    console.log(`Calling url:\n${url}`)
+
+    return RNFetchBlob.fetch('GET',url).then(data=>{
+      let text = data.text()
+      console.log(`Text is \n${text}`)
+      var rowsText = text.split("\"").join("")
+      var rows = rowsText.split("\n")
+      for (var i = 0; i < rows.length; i++) {
+        rows[i] = rows[i].split(",")
+      }
+      let totalPositive = rows[1][4]
+      return {...dayObject,totalPositive:totalPositive}
+    })
+    .catch(error=>{
+      console.log(`Error retrieving covid data: for ${day}` +error)
+    })
+
+  }
+
+  loadCOVID19Data = async () =>{
+    const dataForLastXDays = await this.getCOVID19DataForLastXDays(1)
+    for (var i = 0; i < dataForLastXDays.length; i++) {
+      const covidData = dataForLastXDays[i]
+      if (i == 0 ){
+        this.setState({positiveToday:covidData.totalPositive})
+      }
+    }
+  }
+
+  async componentDidMount (){
+
+    this.loadCOVID19Data()
 
   }
   render(){
@@ -84,7 +153,7 @@ export default class Home extends React.Component{
             <Text>Deceased</Text>
           </View>
           <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'skyblue',alignItems:'center',justifyContent:'center'}}>
-            <Text>Infected</Text>
+            <Text>Casos Positivos</Text>
           </View>
           <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT,borderTopRightRadius:15,  backgroundColor: 'steelblue',alignItems:'center',justifyContent:'center'}}>
             <Text>Recovered</Text>
@@ -95,7 +164,7 @@ export default class Home extends React.Component{
             <Text>{this.state.deceased}</Text>
           </View>
           <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'green',alignItems:'center',justifyContent:'center'}}>
-            <Text>{this.state.infected}</Text>
+            <Text>{this.state.positiveToday}</Text>
           </View>
           <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderBottomRightRadius:15, backgroundColor: 'blue',alignItems:'center',justifyContent:'center'}}>
             <Text>{this.state.recovered}</Text>
