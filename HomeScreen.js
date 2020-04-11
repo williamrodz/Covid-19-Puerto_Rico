@@ -160,7 +160,7 @@ export default class Home extends React.Component{
     const url = COVID_DATA_URL_PREFIX+`${month}-${day}-${year}` + MUNICIPIOS_CSV_SUFFIX
     return RNFetchBlob.fetch('GET',url).then(data=>{
       let text = data.text()
-      console.log(`Text is \n${text}`)
+      // console.log(`Text is \n${text}`)
       var rowsText = text.split("\"").join("")
       var rows = rowsText.split("\n")
       for (var i = 0; i < rows.length; i++) {
@@ -172,7 +172,7 @@ export default class Home extends React.Component{
       MUNICIPIO_CASES_i = 1
       for (var i = MUNICIPIOS_START_i; i < rows.length; i++) {
         const row = rows[i]
-        console.log(`Municipio row: ${row}`)
+        // console.log(`Municipio row: ${row}`)
         const name = row[MUNICIPIO_NAME_i]
         const caseNumber = row[MUNICIPIO_CASES_i]
         dataForMunicipio = {name:name,totalCases:caseNumber}
@@ -205,7 +205,8 @@ export default class Home extends React.Component{
         rows[i] = rows[i].split(",")
       }
       let totalPositive = rows[1][4]
-      return {...dayObject,totalPositive:totalPositive}
+      let totalTests = rows[5][4]
+      return {...dayObject,totalPositive:totalPositive,totalTests:totalTests}
     })
     .catch(error=>{
       console.log(`Error retrieving covid data: for ${day}` +error)
@@ -225,7 +226,7 @@ export default class Home extends React.Component{
       const dateAbbreviation = `${covidData.month}-${covidData.day}`
       console.log(`${dateAbbreviation} has ${covidData.totalPositive}`)
       if (i == 0 ){
-        this.setState({positiveToday:covidData.totalPositive,municipioDataToday:todaysMunicipiosData})
+        this.setState({positiveToday:covidData.totalPositive,totalTests:covidData.totalTests,municipioDataToday:todaysMunicipiosData})
       }
       weeksPositives.push(covidData.totalPositive)
       dateAbbreviations.push(dateAbbreviation)
@@ -260,21 +261,21 @@ export default class Home extends React.Component{
               <Text>Deceased</Text>
             </View>
             <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'skyblue',alignItems:'center',justifyContent:'center'}}>
-              <Text>Casos Positivos</Text>
+              <Text>Casos positivos</Text>
             </View>
             <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT,borderTopRightRadius:15,  backgroundColor: 'steelblue',alignItems:'center',justifyContent:'center'}}>
-              <Text>Recovered</Text>
+              <Text>Pruebas realizadas</Text>
             </View>
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
             <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderBottomLeftRadius:15, backgroundColor: 'red',alignItems:'center',justifyContent:'center'}}>
               <Text>{this.state.deceased}</Text>
             </View>
-            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'green',alignItems:'center',justifyContent:'center'}}>
+            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'deepskyblue',alignItems:'center',justifyContent:'center'}}>
               <Text>{this.state.positiveToday}</Text>
             </View>
-            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderBottomRightRadius:15, backgroundColor: 'blue',alignItems:'center',justifyContent:'center'}}>
-              <Text>{this.state.recovered}</Text>
+            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderBottomRightRadius:15, backgroundColor: 'deepskyblue',alignItems:'center',justifyContent:'center'}}>
+              <Text>{this.state.totalTests}</Text>
             </View>
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
@@ -306,7 +307,7 @@ export default class Home extends React.Component{
                   backgroundColor: "#e26a00",
                   backgroundGradientFrom: "#3498db",
                   backgroundGradientTo: "#34c5db",
-                  decimalPlaces: 2, // optional, defaults to 2dp
+                  decimalPlaces: 0, // optional, defaults to 2dp
                   color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                   labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                   style: {
