@@ -36,15 +36,39 @@ import RNFetchBlob from 'rn-fetch-blob'
 const COVID_DATA_URL_PREFIX = "https://raw.githubusercontent.com/Code4PuertoRico/covid19-pr-api/master/data/PuertoRicoTaskForce/"
 const MUNICIPIOS_CSV_SUFFIX = "/CSV/municipios.csv"
 
+
 const SCROLLVIEW_MARGIN = 5
+const MUNICIPIO_BLOCK_WIDTH = 125
+const MUNICIPIO_BLOCK_HEIGHT = 40
+
+function getCell(text,backgroundColor="ghostwhite",borderTopLeftRadius=0,borderTopRightRadius=0,borderBottomLeftRadius=0,borderBottomRightRadius=0, width=MUNICIPIO_BLOCK_WIDTH,height=MUNICIPIO_BLOCK_HEIGHT,borderWidth=1,borderColor='black'){
+  return (
+    <View style={{borderColor: borderColor, borderWidth: borderWidth,
+      borderTopLeftRadius: borderTopLeftRadius,borderTopRightRadius: borderTopRightRadius,borderBottomLeftRadius: borderBottomLeftRadius, borderBottomRightRadius: borderBottomRightRadius,
+      width: width, height: height, backgroundColor: backgroundColor,
+      alignItems:'center',justifyContent:'center'}}>
+      <Text style={{fontSize: 15}}>{text}</Text>
+    </View>
+  )
+}
 
 
 function getMunicipiosRowsWithData(municipios){
   const allContent = []
-  MUNICIPIO_BLOCK_WIDTH = 125
-  MUNICIPIO_BLOCK_HEIGHT = 40
+
   const municipioNames = Object.keys(municipios)
   for (var i = 0; i < municipioNames.length; i++) {
+
+    if (i==0){
+      allContent.push(
+        <View key={"header"} style={{display:'flex',flexDirection:'row'}}>
+          {getCell("Municipio","gold",15)}
+          {getCell("Casos Positivos","gold",0,15)}
+        </View>
+      )
+    }
+
+
     const municipio = municipioNames[i]
     const borderTopLeftRadius = i == 0 ? 15 : 0
     const borderTopRightRadius = i == 0 ? 15 : 0
@@ -56,12 +80,8 @@ function getMunicipiosRowsWithData(municipios){
 
     var rowContent = (
       <View key={municipio} style={{display:'flex',flexDirection:'row'}}>
-        <View style={{borderColor: 'black', borderWidth: 1, borderTopLeftRadius: borderTopLeftRadius,borderBottomLeftRadius: borderBottomLeftRadius, width: MUNICIPIO_BLOCK_WIDTH, height: MUNICIPIO_BLOCK_HEIGHT, backgroundColor: 'ghostwhite',alignItems:'center',justifyContent:'center'}}>
-          <Text>{municipio}</Text>
-        </View>
-        <View style={{borderColor: 'black', borderWidth: 1,borderTopRightRadius: borderTopRightRadius,borderBottomRightRadius:borderBottomRightRadius, width: MUNICIPIO_BLOCK_WIDTH, height: MUNICIPIO_BLOCK_HEIGHT, backgroundColor: 'ghostwhite',alignItems:'center',justifyContent:'center'}}>
-          <Text>{municipios[municipio].totalCases}</Text>
-        </View>
+        {getCell(municipio)}
+        {getCell(municipios[municipio].totalCases)}
       </View>
 
     )
