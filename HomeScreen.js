@@ -65,7 +65,8 @@ export default class Home extends React.Component{
   constructor(props){
     super(props)
     this.state = {canDriveToday:true,evenLicensePlate:null,
-      deceased:0,positiveToday:0,recovered:0,updateSettingsFunc:this.updateSettings}
+      deceased:0,positiveToday:0,recovered:0,
+      updateSettingsFunc:this.updateSettings}
   }
 
   updateSettings = (newState) =>{
@@ -120,20 +121,30 @@ export default class Home extends React.Component{
   }
 
   loadCOVID19Data = async () =>{
-    const dataForLastXDays = await this.getCOVID19DataForLastXDays(1)
+    const dataForLastXDays = await this.getCOVID19DataForLastXDays(3)
+    var weeksPositives = []
+    var dateAbbreviations = []
     for (var i = 0; i < dataForLastXDays.length; i++) {
       const covidData = dataForLastXDays[i]
+      const dateAbbreviation = `${covidData.month}-${covidData.day}`
+      console.log(`${dateAbbreviation} has ${covidData.totalPositive}`)
       if (i == 0 ){
         this.setState({positiveToday:covidData.totalPositive})
+      }
+      weeksPositives.push(covidData.totalPositive)
+      dateAbbreviations.push(dateAbbreviation)
+      if (i==dataForLastXDays.length - 1){
+        this.setState({weeksPositives:weeksPositives.reverse(),dateAbbreviations:dateAbbreviations.reverse()})
+
       }
     }
   }
 
   async componentDidMount (){
-
     this.loadCOVID19Data()
 
   }
+
   render(){
     var currentDate = new Date()
     const dayOfWeek = currentDate.getDay()
@@ -179,11 +190,11 @@ export default class Home extends React.Component{
         <View style={{display:'flex',flexDirection:'row'}}>
           <LineChart
               data={{
-                labels: ["January", "February", "March", "April", "May", "June"],
+                labels: this.state.dateAbbreviations ? this.state.dateAbbreviations : ["January", "February", "March", "April", "May", "June"],
                 datasets: [
                   {
-                    data: [
-                      Math.random() * 100,
+                    data: this.state.weeksPositives ? this.state.weeksPositives : [
+                      Math.random() * 51,
                       Math.random() * 100,
                       Math.random() * 100,
                       Math.random() * 100,
