@@ -41,7 +41,8 @@ const STOP_COLOR = "#c0392b"
 const DAYS_OF_WEEK_SPANISH = {0:"domingo",1:"lunes",2:"martes",3:"miércoles",4:"jueves",5:"viernes",6:"sábado"}
 const SAMPLE_DATA_URL =  "https://raw.githubusercontent.com/Code4PuertoRico/covid19-pr-api/master/data/PuertoRicoTaskForce/4-07-2020/CSV/resumen.csv"
 const COVID_DATA_URL_PREFIX = "https://raw.githubusercontent.com/Code4PuertoRico/covid19-pr-api/master/data/PuertoRicoTaskForce/"
-const CSV_URL_SUFFIX = "/CSV/resumen.csv"
+const SUMMARY_CSV_SUFFIX = "/CSV/resumen.csv"
+const MUNICIPIOS_CSV_SUFFIX = "/CSV/municipios.csv"
 
 function getLastXDaysCode(numDays){
   days = []
@@ -59,6 +60,45 @@ function getTwoDigitNumber(number){
   if (number < 10){
     return `0${number}`
   }
+}
+
+// <View style={{display:'flex',flexDirection:'row'}}>
+//   <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'chartreuse',alignItems:'center',justifyContent:'center'}}>
+//     <Text>{this.state.deceased}</Text>
+//   </View>
+//   <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'green',alignItems:'center',justifyContent:'center'}}>
+//     <Text>{this.state.positiveToday}</Text>
+//   </View>
+// </View>
+
+function getMunicipiosRowsWithData(municipios,limit=2){
+  const allContent = []
+  MUNICIPIO_BLOCK_WIDTH = 100
+  MUNICIPIO_BLOCK_HEIGHT = 100
+  const municipioNames = Object.keys(municipios)
+
+  for (var i = 0; i < municipioNames.length; i++) {
+    const municipio = municipioNames[i]
+    if (i == limit){
+      break
+    }
+    var rowContent = (
+      <View key={municipio} style={{display:'flex',flexDirection:'row'}}>
+        <View style={{width: MUNICIPIO_BLOCK_WIDTH, height: MUNICIPIO_BLOCK_HEIGHT, backgroundColor: 'chartreuse',alignItems:'center',justifyContent:'center'}}>
+          <Text>{municipio}</Text>
+        </View>
+        <View style={{width: MUNICIPIO_BLOCK_WIDTH, height: MUNICIPIO_BLOCK_HEIGHT, backgroundColor: 'green',alignItems:'center',justifyContent:'center'}}>
+          <Text>{municipios[municipio].totalCases}</Text>
+        </View>
+      </View>
+
+    )
+    allContent.push(rowContent)
+
+  }
+  return allContent
+
+
 }
 
 export default class Home extends React.Component{
@@ -93,19 +133,64 @@ export default class Home extends React.Component{
 
   }
 
+  getMunicipioDataForLastXDays = async (numDays) =>{
+    const days = getLastXDaysCode(numDays)
+    var dataForDays = []
+    for (var i = 0; i < days.length; i++) {
+      dataForDays.push(this.getMunicipioDataForDay(days[i]))
+    }
+    return Promise.all(dataForDays)
+  }
+
+
+  getMunicipioDataForDay = async (dayObject) =>{
+
+    const day = getTwoDigitNumber(dayObject.day)
+    const month = dayObject.month
+    const year = dayObject.year
+
+    const url = COVID_DATA_URL_PREFIX+`${month}-${day}-${year}` + MUNICIPIOS_CSV_SUFFIX
+    return RNFetchBlob.fetch('GET',url).then(data=>{
+      let text = data.text()
+      console.log(`Text is \n${text}`)
+      var rowsText = text.split("\"").join("")
+      var rows = rowsText.split("\n")
+      for (var i = 0; i < rows.length; i++) {
+        rows[i] = rows[i].split(",")
+      }
+      municipios = {}
+      MUNICIPIOS_START_i = 2 // There is no + 78 right bound, since we do not have data for all 78 municipalities
+      MUNICIPIO_NAME_i = 0
+      MUNICIPIO_CASES_i = 1
+      for (var i = MUNICIPIOS_START_i; i < rows.length; i++) {
+        const row = rows[i]
+        console.log(`Municipio row: ${row}`)
+        const name = row[MUNICIPIO_NAME_i]
+        const caseNumber = row[MUNICIPIO_CASES_i]
+        dataForMunicipio = {name:name,totalCases:caseNumber}
+        municipios[name] = dataForMunicipio
+      }
+      return {...dayObject,municipiosData:municipios}
+    })
+    .catch(error=>{
+      console.log(`Error retrieving municipios data: for ${day}` +error)
+    })
+
+  }
+
   getCOVIDDataForDay = async (dayObject) =>{
     const day = getTwoDigitNumber(dayObject.day)
     const month = dayObject.month
     const year = dayObject.year
 
-    console.log(`Getting data for ${month}-${day}-${year}`)
+    // console.log(`Getting data for ${month}-${day}-${year}`)
 
-    const url = COVID_DATA_URL_PREFIX+`${month}-${day}-${year}` + CSV_URL_SUFFIX
-    console.log(`Calling url:\n${url}`)
+    const url = COVID_DATA_URL_PREFIX+`${month}-${day}-${year}` + SUMMARY_CSV_SUFFIX
+    // console.log(`Calling url:\n${url}`)
 
     return RNFetchBlob.fetch('GET',url).then(data=>{
       let text = data.text()
-      console.log(`Text is \n${text}`)
+      // console.log(`Text is \n${text}`)
       var rowsText = text.split("\"").join("")
       var rows = rowsText.split("\n")
       for (var i = 0; i < rows.length; i++) {
@@ -119,8 +204,11 @@ export default class Home extends React.Component{
     })
 
   }
-
   loadCOVID19Data = async () =>{
+    const municipioDataForLastXDays = await this.getMunicipioDataForLastXDays(1)
+    const todaysMunicipiosData = municipioDataForLastXDays[0].municipiosData
+
+
     const dataForLastXDays = await this.getCOVID19DataForLastXDays(3)
     var weeksPositives = []
     var dateAbbreviations = []
@@ -129,7 +217,7 @@ export default class Home extends React.Component{
       const dateAbbreviation = `${covidData.month}-${covidData.day}`
       console.log(`${dateAbbreviation} has ${covidData.totalPositive}`)
       if (i == 0 ){
-        this.setState({positiveToday:covidData.totalPositive})
+        this.setState({positiveToday:covidData.totalPositive,municipioDataToday:todaysMunicipiosData})
       }
       weeksPositives.push(covidData.totalPositive)
       dateAbbreviations.push(dateAbbreviation)
@@ -211,8 +299,8 @@ export default class Home extends React.Component{
               yAxisInterval={1} // optional, defaults to 1
               chartConfig={{
                 backgroundColor: "#e26a00",
-                backgroundGradientFrom: "#fb8c00",
-                backgroundGradientTo: "#ffa726",
+                backgroundGradientFrom: "#3498db",
+                backgroundGradientTo: "#34c5db",
                 decimalPlaces: 2, // optional, defaults to 2dp
                 color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -232,6 +320,8 @@ export default class Home extends React.Component{
               }}
             />
         </View>
+        {this.state.municipioDataToday ? getMunicipiosRowsWithData(this.state.municipioDataToday) : <Text>Hi</Text>}
+
         <View style={{display:'flex',flexDirection:'row'}}>
           <Button title="Settings" onPress={() => this.settingsButton()}/>
 
