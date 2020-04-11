@@ -16,20 +16,37 @@ import {
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import HomeScreen from './HomeScreen'
 import SettingsScreen from './SettingsScreen'
+import MunicipiosScreen from './MunicipiosScreen'
 
 
+const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-export default function App() {
+
+export default function MyTabs() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} options={{headerShown:false}}/>
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-
-      </Stack.Navigator>
+      <Tab.Navigator>
+        <Tab.Screen name="Home" component={HomeScreen} options={{headerShown:false}}/>
+        <Tab.Screen name="Municipios" component={MunicipiosScreen} />
+        <Tab.Screen name="Settings" component={SettingsScreen} />
+      </Tab.Navigator>
     </NavigationContainer>
+
   );
 }
+
+// export default function App() {
+//   return (
+//     <NavigationContainer>
+//       <Stack.Navigator>
+//         <Stack.Screen name="Home" component={HomeScreen} options={{headerShown:false}}/>
+//         <Stack.Screen name="Settings" component={SettingsScreen} />
+//
+//       </Stack.Navigator>
+//     </NavigationContainer>
+//   );
+// }

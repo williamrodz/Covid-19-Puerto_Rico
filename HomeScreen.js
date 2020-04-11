@@ -26,7 +26,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import RNFetchBlob from 'rn-fetch-blob'
-const DATA_LAG_DAYS = 1
+const DATA_LAG_DAYS = 2
 
 const SCROLLVIEW_MARGIN = 5
 
@@ -46,7 +46,7 @@ const DAYS_OF_WEEK_SPANISH = {0:"domingo",1:"lunes",2:"martes",3:"miércoles",4:
 const SAMPLE_DATA_URL =  "https://raw.githubusercontent.com/Code4PuertoRico/covid19-pr-api/master/data/PuertoRicoTaskForce/4-07-2020/CSV/resumen.csv"
 const COVID_DATA_URL_PREFIX = "https://raw.githubusercontent.com/Code4PuertoRico/covid19-pr-api/master/data/PuertoRicoTaskForce/"
 const SUMMARY_CSV_SUFFIX = "/CSV/resumen.csv"
-const MUNICIPIOS_CSV_SUFFIX = "/CSV/municipios.csv"
+
 
 function getLastXDaysCode(numDays){
   days = []
@@ -75,39 +75,6 @@ function getTwoDigitNumber(number){
 //   </View>
 // </View>
 
-function getMunicipiosRowsWithData(municipios){
-  const allContent = []
-  MUNICIPIO_BLOCK_WIDTH = 125
-  MUNICIPIO_BLOCK_HEIGHT = 40
-  const municipioNames = Object.keys(municipios)
-  for (var i = 0; i < municipioNames.length; i++) {
-    const municipio = municipioNames[i]
-    const borderTopLeftRadius = i == 0 ? 15 : 0
-    const borderTopRightRadius = i == 0 ? 15 : 0
-    const borderBottomLeftRadius = i == municipioNames.length - 1 ? 15 : 0
-    const borderBottomRightRadius = i == municipioNames.length - 1 ? 15 : 0
-    // const cellColor
-    // // if municipio.totalCases >= 30
-
-
-    var rowContent = (
-      <View key={municipio} style={{display:'flex',flexDirection:'row'}}>
-        <View style={{borderColor: 'black', borderWidth: 1, borderTopLeftRadius: borderTopLeftRadius,borderBottomLeftRadius: borderBottomLeftRadius, width: MUNICIPIO_BLOCK_WIDTH, height: MUNICIPIO_BLOCK_HEIGHT, backgroundColor: 'ghostwhite',alignItems:'center',justifyContent:'center'}}>
-          <Text>{municipio}</Text>
-        </View>
-        <View style={{borderColor: 'black', borderWidth: 1,borderTopRightRadius: borderTopRightRadius,borderBottomRightRadius:borderBottomRightRadius, width: MUNICIPIO_BLOCK_WIDTH, height: MUNICIPIO_BLOCK_HEIGHT, backgroundColor: 'ghostwhite',alignItems:'center',justifyContent:'center'}}>
-          <Text>{municipios[municipio].totalCases}</Text>
-        </View>
-      </View>
-
-    )
-    allContent.push(rowContent)
-
-  }
-  return allContent
-
-
-}
 
 export default class Home extends React.Component{
   constructor(props){
@@ -141,50 +108,9 @@ export default class Home extends React.Component{
 
   }
 
-  getMunicipioDataForLastXDays = async (numDays) =>{
-    const days = getLastXDaysCode(numDays)
-    var dataForDays = []
-    for (var i = 0; i < days.length; i++) {
-      dataForDays.push(this.getMunicipioDataForDay(days[i]))
-    }
-    return Promise.all(dataForDays)
-  }
 
 
-  getMunicipioDataForDay = async (dayObject) =>{
 
-    const day = getTwoDigitNumber(dayObject.day)
-    const month = dayObject.month
-    const year = dayObject.year
-
-    const url = COVID_DATA_URL_PREFIX+`${month}-${day}-${year}` + MUNICIPIOS_CSV_SUFFIX
-    return RNFetchBlob.fetch('GET',url).then(data=>{
-      let text = data.text()
-      // console.log(`Text is \n${text}`)
-      var rowsText = text.split("\"").join("")
-      var rows = rowsText.split("\n")
-      for (var i = 0; i < rows.length; i++) {
-        rows[i] = rows[i].split(",")
-      }
-      municipios = {}
-      MUNICIPIOS_START_i = 2 // There is no + 78 right bound, since we do not have data for all 78 municipalities
-      MUNICIPIO_NAME_i = 0
-      MUNICIPIO_CASES_i = 1
-      for (var i = MUNICIPIOS_START_i; i < rows.length; i++) {
-        const row = rows[i]
-        // console.log(`Municipio row: ${row}`)
-        const name = row[MUNICIPIO_NAME_i]
-        const caseNumber = row[MUNICIPIO_CASES_i]
-        dataForMunicipio = {name:name,totalCases:caseNumber}
-        municipios[name] = dataForMunicipio
-      }
-      return {...dayObject,municipiosData:municipios}
-    })
-    .catch(error=>{
-      console.log(`Error retrieving municipios data: for ${day}` +error)
-    })
-
-  }
 
   getCOVIDDataForDay = async (dayObject) =>{
     const day = getTwoDigitNumber(dayObject.day)
@@ -214,8 +140,6 @@ export default class Home extends React.Component{
 
   }
   loadCOVID19Data = async () =>{
-    const municipioDataForLastXDays = await this.getMunicipioDataForLastXDays(1)
-    const todaysMunicipiosData = municipioDataForLastXDays[0].municipiosData
 
 
     const dataForLastXDays = await this.getCOVID19DataForLastXDays(3)
@@ -226,7 +150,7 @@ export default class Home extends React.Component{
       const dateAbbreviation = `${covidData.month}-${covidData.day}`
       console.log(`${dateAbbreviation} has ${covidData.totalPositive}`)
       if (i == 0 ){
-        this.setState({positiveToday:covidData.totalPositive,totalTests:covidData.totalTests,municipioDataToday:todaysMunicipiosData})
+        this.setState({positiveToday:covidData.totalPositive,totalTests:covidData.totalTests})
       }
       weeksPositives.push(covidData.totalPositive)
       dateAbbreviations.push(dateAbbreviation)
@@ -326,7 +250,6 @@ export default class Home extends React.Component{
                 }}
               />
           </View>
-          {this.state.municipioDataToday ? getMunicipiosRowsWithData(this.state.municipioDataToday) : <Text>Hi</Text>}
 
           <View style={{display:'flex',flexDirection:'row'}}>
             <Button title="Settings" onPress={() => this.settingsButton()}/>
