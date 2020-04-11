@@ -24,29 +24,25 @@ import MunicipiosScreen from './MunicipiosScreen'
 
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
-export default function MyTabs() {
-  return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Home" component={HomeScreen} options={{headerShown:false}}/>
-        <Tab.Screen name="Municipios" component={MunicipiosScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
+export default class MyTabs extends React.Component {
+  constructor(props){
+    super(props)
+    this.state = {evenLicensePlate:null}
+  }
 
-  );
+  render (){
+    return (
+      <NavigationContainer>
+        <Tab.Navigator testProp={{testing:"hi"}}>
+          <Tab.Screen name="Home" component={HomeScreen} initialParams={{ evenLicensePlate: null}} options={{headerShown:false}}/>
+          <Tab.Screen name="Municipios" component={MunicipiosScreen} />
+          <Tab.Screen name="Settings" component={SettingsScreen} />
+        </Tab.Navigator>
+      </NavigationContainer>
+
+    );
+
+  }
+
 }
-
-// export default function App() {
-//   return (
-//     <NavigationContainer>
-//       <Stack.Navigator>
-//         <Stack.Screen name="Home" component={HomeScreen} options={{headerShown:false}}/>
-//         <Stack.Screen name="Settings" component={SettingsScreen} />
-//
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//   );
-// }

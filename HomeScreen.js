@@ -36,8 +36,8 @@ const BLOCK_HEIGHT = 60
 const DAYS_FOR_EVEN_PLATES = {1:true,3:true,5:true}
 const DAYS_FOR_ODD_PLATES = {2:true,4:true,6:true}
 
-const CAN_DRIVE_TEXT = "Puedes guiar"
-const CANT_DRIVE_TEXT = "Esta prohibido guiar"
+const CAN_DRIVE_TEXT = "Puedes guiar para gestiones de primera necesidad"
+const CANT_DRIVE_TEXT = "\nEstá prohibido guiar, salvo para ciertas exenciones"
 
 const GO_COLOR = "#2ecc71"
 const STOP_COLOR = "#c0392b"
@@ -66,22 +66,41 @@ function getTwoDigitNumber(number){
   }
 }
 
-// <View style={{display:'flex',flexDirection:'row'}}>
-//   <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'chartreuse',alignItems:'center',justifyContent:'center'}}>
-//     <Text>{this.state.deceased}</Text>
-//   </View>
-//   <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'green',alignItems:'center',justifyContent:'center'}}>
-//     <Text>{this.state.positiveToday}</Text>
-//   </View>
-// </View>
 
 
 export default class Home extends React.Component{
   constructor(props){
     super(props)
-    this.state = {canDriveToday:true,evenLicensePlate:null,
+    this.state = {canDriveToday:true,
       deceased:0,positiveToday:0,recovered:0,
       updateSettingsFunc:this.updateSettings}
+  }
+
+
+  getLicensePlateCard = (canDriveToday,dayOfWeek) =>{
+    if (canDriveToday == null){
+      cardColor = "gray"
+      drivingRecommendation = <Button title={"Toca aquí para saber si puedes guiar"} onPress={()=>this.props.navigation.navigate("Settings")}/>
+    } else if (canDriveToday) {
+      cardColor = GO_COLOR
+      drivingRecommendation = <Text>{CAN_DRIVE_TEXT}</Text>
+    } else{
+      cardColor = STOP_COLOR
+      drivingRecommendation = <Text style={{textAlign: 'center'}}>{CANT_DRIVE_TEXT}</Text>
+    }
+
+    const drivingDayDescription = `Hoy es ${DAYS_OF_WEEK_SPANISH[dayOfWeek]}, día para tabillas ${dayOfWeek % 2 != 0 ? "impares": "pares"}`
+
+    return (
+      <View style={{display:'flex',flexDirection:'row'}}>
+        <View style={{backgroundColor:cardColor,height:100,width:300,borderRadius:15,alignItems:'center',justifyContent:'center'}}>
+          <Text>{drivingDayDescription}</Text>
+          {drivingRecommendation}
+        </View>
+      </View>
+    )
+
+
   }
 
   updateSettings = (newState) =>{
@@ -93,10 +112,6 @@ export default class Home extends React.Component{
 
   }
 
-  settingsButton = () =>{
-    this.props.navigation.navigate('Settings',{...this.state})
-
-  }
 
   getCOVID19DataForLastXDays = async (numDays) => {
     const days = getLastXDaysCode(numDays)
@@ -107,10 +122,6 @@ export default class Home extends React.Component{
     return Promise.all(dataForDays)
 
   }
-
-
-
-
 
   getCOVIDDataForDay = async (dayObject) =>{
     const day = getTwoDigitNumber(dayObject.day)
@@ -170,15 +181,17 @@ export default class Home extends React.Component{
     var currentDate = new Date()
     const dayOfWeek = currentDate.getDay()
 
-    const canDriveToday = (this.state.evenLicensePlate && dayOfWeek in DAYS_FOR_EVEN_PLATES) || (!this.state.evenLicensePlate && dayOfWeek in DAYS_FOR_ODD_PLATES)
-    const drivingDayDescription = `Hoy es ${DAYS_OF_WEEK_SPANISH[dayOfWeek]}, día para tabillas ${dayOfWeek % 2 != 0 ? "impares": "pares"}`
+    const evenLicensePlate = this.props.route.params.evenLicensePlate
+    var canDriveToday
+    if (evenLicensePlate == null){
+      canDriveToday = null
+    } else{
+      canDriveToday = (evenLicensePlate && dayOfWeek in DAYS_FOR_EVEN_PLATES) || (!evenLicensePlate && dayOfWeek in DAYS_FOR_ODD_PLATES)
+    }
 
     return (
       <SafeAreaView style={{...StyleSheet.absoluteFillObject,display:'flex',flexDirection: 'column', alignItems:'center',justifyContent:'center'}}>
-        <ScrollView contentContainerStyle={{flexGrow:1,display:'flex',flexDirection:'column',alignItems: 'center',margin:SCROLLVIEW_MARGIN}}>
-          <View style={{display:'flex',flexDirection:'row',width:300,height:70,backgroundColor:'purple',borderRadius:15,alignItems:'center',justifyContent:'center'}}>
-            <Text style={{fontSize:50}}>9:41</Text>
-          </View>
+        <ScrollView contentContainerStyle={{flexGrow:1,display:'flex',flexDirection:'column',alignItems: 'center',margin:SCROLLVIEW_MARGIN,}}>
 
           <View style={{display:'flex',flexDirection:'row'}}>
             <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderTopLeftRadius:15, backgroundColor: 'powderblue',alignItems:'center',justifyContent:'center'}}>
@@ -202,12 +215,7 @@ export default class Home extends React.Component{
               <Text>{this.state.totalTests}</Text>
             </View>
           </View>
-          <View style={{display:'flex',flexDirection:'row'}}>
-            <View style={{backgroundColor:canDriveToday ? GO_COLOR : STOP_COLOR,height:100,width:300,borderRadius:15,alignItems:'center',justifyContent:'center'}}>
-              <Text>{drivingDayDescription}</Text>
-              <Text>{canDriveToday ? CAN_DRIVE_TEXT : CANT_DRIVE_TEXT}</Text>
-            </View>
-          </View>
+          {this.getLicensePlateCard(canDriveToday,dayOfWeek)}
           <View style={{display:'flex',flexDirection:'row'}}>
             <LineChart
                 data={{
@@ -250,12 +258,6 @@ export default class Home extends React.Component{
                 }}
               />
           </View>
-
-          <View style={{display:'flex',flexDirection:'row'}}>
-            <Button title="Settings" onPress={() => this.settingsButton()}/>
-
-          </View>
-
 
         </ScrollView>
       </SafeAreaView>

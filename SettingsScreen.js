@@ -4,7 +4,8 @@ import {
   View,
   Text,
   Button,
-  TextInput
+  TextInput,
+  ScrollView,
 } from 'react-native';
 
 
@@ -22,15 +23,13 @@ export default class SettingsScreen extends React.Component{
   }
 
   saveSettingsButton = () =>{
-    // console.log(`Route params are ${this.props.route.params["updateSettingsFunc"]}`)
-    this.props.route.params["updateSettingsFunc"](this.state)
     this.props.navigation.navigate("Home",{evenLicensePlate:this.state.evenLicensePlate})
 
   }
 
   render(){
     return (
-      <View style={{flex:1,flexDirection: 'column',alignItems: 'center',justifyContent: 'center'}}>
+      <ScrollView keyboardShouldPersistTaps='handled' contentContainerStyle={{flexGrow:1,flexDirection: 'column',alignItems: 'center',justifyContent: 'center'}}>
         <Text>¿En qué digito termina tu tablilla?</Text>
         <View style={{flexDirection: 'row',width: 300, height: 100, backgroundColor: 'skyblue',alignItems:'center',justifyContent:'center',borderRadius: 15}}>
           <Text style ={{fontSize: 50,fontFamily: 'Menlo',color:'grey'}}>000-00</Text>
@@ -44,7 +43,7 @@ export default class SettingsScreen extends React.Component{
           />
         </View>
         <Button title="Save" onPress={()=>this.saveSettingsButton()}/>
-      </View>
+      </ScrollView>
     )
   }
 }
