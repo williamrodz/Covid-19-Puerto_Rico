@@ -24,6 +24,7 @@ import {
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import RNFetchBlob from 'rn-fetch-blob'
 const DATA_LAG_DAYS = 2
@@ -198,10 +199,10 @@ export default class Home extends React.Component{
               <Text>Deceased</Text>
             </View>
             <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'skyblue',alignItems:'center',justifyContent:'center'}}>
-              <Text>Casos positivos</Text>
+              <Text style={{textAlign: 'center'}}>Casos positivos</Text>
             </View>
             <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT,borderTopRightRadius:15,  backgroundColor: 'steelblue',alignItems:'center',justifyContent:'center'}}>
-              <Text>Pruebas realizadas</Text>
+              <Text style={{textAlign: 'center'}}>Pruebas realizadas</Text>
             </View>
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
@@ -258,6 +259,7 @@ export default class Home extends React.Component{
                 }}
               />
           </View>
+
 
         </ScrollView>
       </SafeAreaView>

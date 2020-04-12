@@ -17,6 +17,7 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import HomeScreen from './HomeScreen'
 import SettingsScreen from './SettingsScreen'
@@ -31,13 +32,26 @@ export default class MyTabs extends React.Component {
     this.state = {evenLicensePlate:null}
   }
 
+
   render (){
     return (
       <NavigationContainer>
-        <Tab.Navigator testProp={{testing:"hi"}}>
-          <Tab.Screen name="Home" component={HomeScreen} initialParams={{ evenLicensePlate: null}} options={{headerShown:false}}/>
-          <Tab.Screen name="Municipios" component={MunicipiosScreen} />
-          <Tab.Screen name="Settings" component={SettingsScreen} />
+        <Tab.Navigator tabBarOptions={{activeBackgroundColor:'white'}}>
+          <Tab.Screen name="Home" component={HomeScreen} initialParams={{ evenLicensePlate: null}}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+            <Icon name="home" size={size} color={color} />
+          )}} />
+          <Tab.Screen name="Municipios" component={MunicipiosScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+            <Icon name="navicon" size={size} color={color} />
+          )}} />
+          <Tab.Screen name="Settings" component={SettingsScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+            <Icon name="gear" size={size} color={color} />
+          )}} />
         </Tab.Navigator>
       </NavigationContainer>
 
