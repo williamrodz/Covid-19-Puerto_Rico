@@ -10,7 +10,7 @@ import {
 
 // import {getTwoDigitNumber,getLastXDaysCode} from './HomeScreen'
 
-DATA_LAG_DAYS = 2
+DATA_LAG_DAYS = 3
 function getTwoDigitNumber(number){
   if (number < 10){
     return `0${number}`

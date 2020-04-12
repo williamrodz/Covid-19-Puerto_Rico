@@ -1,4 +1,4 @@
-package com.covid_pr;
+package com.goldenrod.covid19pr.android;
 
 import com.facebook.react.ReactActivity;
 

@@ -27,7 +27,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import RNFetchBlob from 'rn-fetch-blob'
-const DATA_LAG_DAYS = 2
+const DATA_LAG_DAYS = 3
 
 const SCROLLVIEW_MARGIN = 5
 
