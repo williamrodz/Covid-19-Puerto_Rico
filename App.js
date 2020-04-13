@@ -18,6 +18,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
+Icon.loadFont()
 
 import HomeScreen from './HomeScreen'
 import SettingsScreen from './SettingsScreen'

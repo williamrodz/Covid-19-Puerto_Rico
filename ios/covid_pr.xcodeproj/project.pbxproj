@@ -17,7 +17,7 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* covid_prTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* covid_prTests.m */; };
-		3DA6675C2443A659007A00F3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3DA6675B2443A659007A00F3 /* GoogleService-Info.plist */; };
+		3DBEFD3F2443D7CD0083331F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3DBEFD3E2443D7CD0083331F /* GoogleService-Info.plist */; };
 		7508967FA9F593B272487B7D /* libPods-covid_pr.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B36F5E1C7EB4319CF075A9DA /* libPods-covid_pr.a */; };
 		D27369B9757D071369F05E19 /* libPods-covid_pr-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38F47BC10D3049590C675D92 /* libPods-covid_pr-tvOSTests.a */; };
 		E57706935FC2BE48A5031782 /* libPods-covid_pr-covid_prTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AB76686DDBD17337A90885F /* libPods-covid_pr-covid_prTests.a */; };
@@ -59,7 +59,7 @@
 		2D76ED22817C2229C327FDB2 /* Pods-covid_pr-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-covid_pr-tvOS.release.xcconfig"; path = "Target Support Files/Pods-covid_pr-tvOS/Pods-covid_pr-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		342B4F3EAFE315CB1AA9A777 /* Pods-covid_pr.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-covid_pr.release.xcconfig"; path = "Target Support Files/Pods-covid_pr/Pods-covid_pr.release.xcconfig"; sourceTree = "<group>"; };
 		38F47BC10D3049590C675D92 /* libPods-covid_pr-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-covid_pr-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3DA6675B2443A659007A00F3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		3DBEFD3E2443D7CD0083331F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		58680D232585CE42AB2904D1 /* Pods-covid_pr-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-covid_pr-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-covid_pr-tvOS/Pods-covid_pr-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		7DDFDEE200FAADEEFED5641D /* Pods-covid_pr-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-covid_pr-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-covid_pr-tvOSTests/Pods-covid_pr-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		B36F5E1C7EB4319CF075A9DA /* libPods-covid_pr.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-covid_pr.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -176,7 +176,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				3DA6675B2443A659007A00F3 /* GoogleService-Info.plist */,
+				3DBEFD3E2443D7CD0083331F /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* covid_pr */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* covid_prTests */,
@@ -345,7 +345,7 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				3DA6675C2443A659007A00F3 /* GoogleService-Info.plist in Resources */,
+				3DBEFD3F2443D7CD0083331F /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,6 +418,7 @@
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+				"${PODS_CONFIGURATION_BUILD_DIR}/gRPC-C++/gRPCCertificates-Cpp.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -437,6 +438,7 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gRPCCertificates-Cpp.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -564,6 +566,7 @@
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+				"${PODS_CONFIGURATION_BUILD_DIR}/gRPC-C++/gRPCCertificates-Cpp.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -583,6 +586,7 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gRPCCertificates-Cpp.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -754,7 +758,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.goldenrod.covid19pr.ios;
 				PRODUCT_NAME = covid_pr;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -776,7 +780,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.goldenrod.covid19pr.ios;
 				PRODUCT_NAME = covid_pr;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

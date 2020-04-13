@@ -21,10 +21,10 @@ import {
   ScrollView
 } from 'react-native';
 
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import firestore from '@react-native-firebase/firestore';
 
 import RNFetchBlob from 'rn-fetch-blob'
 const DATA_LAG_DAYS = 3
@@ -73,7 +73,7 @@ export default class Home extends React.Component{
   constructor(props){
     super(props)
     this.state = {canDriveToday:true,
-      deceased:0,positiveToday:0,recovered:0,
+      deceased:0,confirmedCases:0,recovered:0,
       updateSettingsFunc:this.updateSettings}
   }
 
@@ -152,30 +152,25 @@ export default class Home extends React.Component{
 
   }
   loadCOVID19Data = async () =>{
-
-
-    const dataForLastXDays = await this.getCOVID19DataForLastXDays(3)
-    var weeksPositives = []
-    var dateAbbreviations = []
-    for (var i = 0; i < dataForLastXDays.length; i++) {
-      const covidData = dataForLastXDays[i]
-      const dateAbbreviation = `${covidData.month}-${covidData.day}`
-      console.log(`${dateAbbreviation} has ${covidData.totalPositive}`)
-      if (i == 0 ){
-        this.setState({positiveToday:covidData.totalPositive,totalTests:covidData.totalTests})
-      }
-      weeksPositives.push(covidData.totalPositive)
-      dateAbbreviations.push(dateAbbreviation)
-      if (i==dataForLastXDays.length - 1){
-        this.setState({weeksPositives:weeksPositives.reverse(),dateAbbreviations:dateAbbreviations.reverse()})
-
-      }
+    const covidData = await firestore().doc("data/todaysData").get() //().collection('data')
+    if (covidData.exists){
+      data = covidData.data()
+      console.log("DATA IS\n",dataObject)
+      this.setState({conductedTests:data.conductedTests,
+      confirmedCases:data.confirmedCases,
+      deaths:data.deaths,
+      negativeCases:data.negativeCases,
+      testsInProgress:data.testsInProgress,
+      timestamp:data.timestamp
+    })
+    } else{
+      console.log("Data for today does not exist")
     }
+
   }
 
   async componentDidMount (){
     this.loadCOVID19Data()
-
   }
 
   render(){
@@ -207,13 +202,13 @@ export default class Home extends React.Component{
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
             <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderBottomLeftRadius:15, backgroundColor: 'red',alignItems:'center',justifyContent:'center'}}>
-              <Text>{this.state.deceased}</Text>
+              <Text>{this.state.deaths}</Text>
             </View>
             <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'deepskyblue',alignItems:'center',justifyContent:'center'}}>
-              <Text>{this.state.positiveToday}</Text>
+              <Text>{this.state.confirmedCases}</Text>
             </View>
             <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderBottomRightRadius:15, backgroundColor: 'deepskyblue',alignItems:'center',justifyContent:'center'}}>
-              <Text>{this.state.totalTests}</Text>
+              <Text>{this.state.conductedTests}</Text>
             </View>
           </View>
           {this.getLicensePlateCard(canDriveToday,dayOfWeek)}
