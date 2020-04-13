@@ -33,6 +33,12 @@ const SCROLLVIEW_MARGIN = 5
 
 const BLOCK_WIDTH = 100
 const BLOCK_HEIGHT = 60
+const DATA_VALUE_COLOR = "#ecf0f1"
+const DATA_LABEL_COLOR = "#8e44ad"
+const BACKGROUND_COLOR = "#bdc3c7"
+
+const LABEL_FONT_SIZE = 15
+const DATA_FONT_SIZE = 24
 
 const DAYS_FOR_EVEN_PLATES = {1:true,3:true,5:true}
 const DAYS_FOR_ODD_PLATES = {2:true,4:true,6:true}
@@ -101,7 +107,6 @@ export default class Home extends React.Component{
       </View>
     )
 
-
   }
 
   updateSettings = (newState) =>{
@@ -161,7 +166,14 @@ export default class Home extends React.Component{
       deaths:data.deaths,
       negativeCases:data.negativeCases,
       testsInProgress:data.testsInProgress,
-      timestamp:data.timestamp
+      month:data.month,
+      day:data.day,
+      year:data.year,
+      hour:data.hour,
+      minutes:data.minutes,
+
+
+
     })
     } else{
       console.log("Data for today does not exist")
@@ -171,6 +183,25 @@ export default class Home extends React.Component{
 
   async componentDidMount (){
     this.loadCOVID19Data()
+  }
+
+  getDataBlock(blockType,text,borderTopLeftRadius=0,borderTopRightRadius=0,borderBottomLeftRadius=0,borderBottomRightRadius=0){
+    if (blockType == "label"){
+      backgroundColor = DATA_LABEL_COLOR
+      fontSize = LABEL_FONT_SIZE
+    }
+    else if (blockType == "data"){
+      backgroundColor = DATA_VALUE_COLOR
+      fontSize = DATA_FONT_SIZE
+    }
+    return (
+      <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT,
+        borderTopLeftRadius: borderTopLeftRadius,borderTopRightRadius:borderTopRightRadius,borderBottomLeftRadius: borderBottomLeftRadius,borderBottomRightRadius:borderBottomRightRadius,
+        backgroundColor: backgroundColor,
+        alignItems:'center',justifyContent:'center'}}>
+        <Text style={{textAlign: 'center',fontSize:fontSize}}>{text}</Text>
+      </View>
+    )
   }
 
   render(){
@@ -187,31 +218,31 @@ export default class Home extends React.Component{
 
     return (
       <SafeAreaView style={{...StyleSheet.absoluteFillObject,display:'flex',flexDirection: 'column', alignItems:'center',justifyContent:'center'}}>
-        <ScrollView contentContainerStyle={{flexGrow:1,display:'flex',flexDirection:'column',alignItems: 'center',margin:SCROLLVIEW_MARGIN,}}>
+        <ScrollView contentContainerStyle={{flexGrow:1,display:'flex',flexDirection:'column',alignItems: 'center',margin:SCROLLVIEW_MARGIN,backgroundColor:BACKGROUND_COLOR}}>
 
           <View style={{display:'flex',flexDirection:'row'}}>
-            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderTopLeftRadius:15, backgroundColor: 'powderblue',alignItems:'center',justifyContent:'center'}}>
-              <Text>Deceased</Text>
-            </View>
-            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'skyblue',alignItems:'center',justifyContent:'center'}}>
-              <Text style={{textAlign: 'center'}}>Casos positivos</Text>
-            </View>
-            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT,borderTopRightRadius:15,  backgroundColor: 'steelblue',alignItems:'center',justifyContent:'center'}}>
-              <Text style={{textAlign: 'center'}}>Pruebas realizadas</Text>
-            </View>
+            {this.getDataBlock("label","Casos positivos",15)}
+            {this.getDataBlock("label","Casos negativos")}
+            {this.getDataBlock("label","Muertes",0,15)}
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
-            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderBottomLeftRadius:15, backgroundColor: 'red',alignItems:'center',justifyContent:'center'}}>
-              <Text>{this.state.deaths}</Text>
-            </View>
-            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, backgroundColor: 'deepskyblue',alignItems:'center',justifyContent:'center'}}>
-              <Text>{this.state.confirmedCases}</Text>
-            </View>
-            <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT, borderBottomRightRadius:15, backgroundColor: 'deepskyblue',alignItems:'center',justifyContent:'center'}}>
-              <Text>{this.state.conductedTests}</Text>
-            </View>
+            {this.getDataBlock("data",this.state.confirmedCases,0,0,15)}
+            {this.getDataBlock("data",this.state.negativeCases)}
+            {this.getDataBlock("data",this.state.deaths,0,0,0,15)}
           </View>
-          {this.getLicensePlateCard(canDriveToday,dayOfWeek)}
+
+          <View style={{display:'flex',flexDirection:'row'}}>
+            {this.getDataBlock("label","Pruebas en proceso",15)}
+            {this.getDataBlock("label","Pruebas realizadas",0,15)}
+          </View>
+
+          <View style={{display:'flex',flexDirection:'row'}}>
+            {this.getDataBlock("data",this.state.testsInProgress,0,0,15)}
+            {this.getDataBlock("data",this.state.conductedTests,0,0,0,15)}
+          </View>
+          <View style={{display:'flex',flexDirection:'row'}}>
+            <Text>{`Actualizado ${this.state.day}-${this.state.month}-${this.state.year}`}</Text>
+          </View>
           <View style={{display:'flex',flexDirection:'row'}}>
             <LineChart
                 data={{
@@ -253,7 +284,9 @@ export default class Home extends React.Component{
                   borderRadius: 16
                 }}
               />
-          </View>
+          </View>          
+
+          {this.getLicensePlateCard(canDriveToday,dayOfWeek)}
 
 
         </ScrollView>
