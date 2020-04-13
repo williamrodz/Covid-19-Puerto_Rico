@@ -74,8 +74,6 @@ function getTwoDigitNumber(number){
   }
 }
 
-
-
 export default class Home extends React.Component{
   constructor(props){
     super(props)
@@ -136,7 +134,6 @@ export default class Home extends React.Component{
       console.log("Historical data"+last7Days)
       this.setState({last7Days:last7Days})
     }
-
 
   }
 
@@ -210,7 +207,7 @@ export default class Home extends React.Component{
                   labels: this.state.last7Days ? this.state.last7Days.map((item)=>`${item.day}-${item.month}`) : ["January", "February", "March", "April", "May", "June"],
                   datasets: [
                     {
-                      data: this.state.last7Days ? this.state.last7Days.map((item)=>item.totalPositive) : [
+                      data: this.state.last7Days ? this.state.last7Days.map((item)=>item.confirmedCases) : [
                         4,
                         16,
                         256,
@@ -239,7 +236,6 @@ export default class Home extends React.Component{
                     stroke: "#ffa726"
                   }
                 }}
-
                 style={{
                   marginVertical: 8,
                   borderRadius: 16
@@ -248,7 +244,6 @@ export default class Home extends React.Component{
           </View>
 
           {this.getLicensePlateCard(canDriveToday,dayOfWeek)}
-
 
         </ScrollView>
       </SafeAreaView>
