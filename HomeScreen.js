@@ -33,8 +33,9 @@ const SCROLLVIEW_MARGIN = 5
 
 const BLOCK_WIDTH = 100
 const BLOCK_HEIGHT = 60
-const DATA_VALUE_COLOR = "#ecf0f1"
-const DATA_LABEL_COLOR = "#8e44ad"
+const DATA_VALUE_BACKGROUND_COLOR = "#ecf0f1"
+const DATA_VALUE_TEXT_COLOR = "white"
+const DATA_LABEL_BACKGROUND_COLOR = "#8e44ad"
 const BACKGROUND_COLOR = "#bdc3c7"
 
 const LABEL_FONT_SIZE = 15
@@ -78,9 +79,7 @@ function getTwoDigitNumber(number){
 export default class Home extends React.Component{
   constructor(props){
     super(props)
-    this.state = {canDriveToday:true,
-      deceased:0,confirmedCases:0,recovered:0,
-      updateSettingsFunc:this.updateSettings}
+    this.state = {canDriveToday:true,confirmedCases:0,}
   }
 
 
@@ -109,59 +108,13 @@ export default class Home extends React.Component{
 
   }
 
-  updateSettings = (newState) =>{
-    console.log("Updating state")
-    console.log(`New state is ${newState}`)
-    console.log(`New state keys are ${Object.keys(newState)}`)
-
-    this.setState(newState)
-
-  }
-
-
-  getCOVID19DataForLastXDays = async (numDays) => {
-    const days = getLastXDaysCode(numDays)
-    var dataForDays = []
-    for (var i = 0; i < days.length; i++) {
-      dataForDays.push(this.getCOVIDDataForDay(days[i]))
-    }
-    return Promise.all(dataForDays)
-
-  }
-
-  getCOVIDDataForDay = async (dayObject) =>{
-    const day = getTwoDigitNumber(dayObject.day)
-    const month = dayObject.month
-    const year = dayObject.year
-
-    // console.log(`Getting data for ${month}-${day}-${year}`)
-
-    const url = COVID_DATA_URL_PREFIX+`${month}-${day}-${year}` + SUMMARY_CSV_SUFFIX
-    // console.log(`Calling url:\n${url}`)
-
-    return RNFetchBlob.fetch('GET',url).then(data=>{
-      let text = data.text()
-      // console.log(`Text is \n${text}`)
-      var rowsText = text.split("\"").join("")
-      var rows = rowsText.split("\n")
-      for (var i = 0; i < rows.length; i++) {
-        rows[i] = rows[i].split(",")
-      }
-      let totalPositive = rows[1][4]
-      let totalTests = rows[5][4]
-      return {...dayObject,totalPositive:totalPositive,totalTests:totalTests}
-    })
-    .catch(error=>{
-      console.log(`Error retrieving covid data: for ${day}` +error)
-    })
-
-  }
   loadCOVID19Data = async () =>{
     const covidData = await firestore().doc("data/todaysData").get() //().collection('data')
     if (covidData.exists){
       data = covidData.data()
       console.log("DATA IS\n",dataObject)
-      this.setState({conductedTests:data.conductedTests,
+      this.setState({
+      conductedTests:data.conductedTests,
       confirmedCases:data.confirmedCases,
       deaths:data.deaths,
       negativeCases:data.negativeCases,
@@ -172,12 +125,18 @@ export default class Home extends React.Component{
       hour:data.hour,
       minutes:data.minutes,
 
-
-
     })
     } else{
       console.log("Data for today does not exist")
     }
+    const historicalDataRef = await firestore().doc("data/historicalData").get()
+    if (historicalDataRef.exists){
+      historicalData = historicalDataRef.data()
+      last7Days = historicalData.last7Days
+      console.log("Historical data"+last7Days)
+      this.setState({last7Days:last7Days})
+    }
+
 
   }
 
@@ -187,19 +146,21 @@ export default class Home extends React.Component{
 
   getDataBlock(blockType,text,borderTopLeftRadius=0,borderTopRightRadius=0,borderBottomLeftRadius=0,borderBottomRightRadius=0){
     if (blockType == "label"){
-      backgroundColor = DATA_LABEL_COLOR
+      backgroundColor = DATA_LABEL_BACKGROUND_COLOR
       fontSize = LABEL_FONT_SIZE
+      fontColor = DATA_VALUE_TEXT_COLOR
     }
     else if (blockType == "data"){
-      backgroundColor = DATA_VALUE_COLOR
+      backgroundColor = DATA_VALUE_BACKGROUND_COLOR
       fontSize = DATA_FONT_SIZE
+      fontColor = "black"
     }
     return (
       <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT,
         borderTopLeftRadius: borderTopLeftRadius,borderTopRightRadius:borderTopRightRadius,borderBottomLeftRadius: borderBottomLeftRadius,borderBottomRightRadius:borderBottomRightRadius,
         backgroundColor: backgroundColor,
         alignItems:'center',justifyContent:'center'}}>
-        <Text style={{textAlign: 'center',fontSize:fontSize}}>{text}</Text>
+        <Text style={{textAlign: 'center',fontSize:fontSize,color: fontColor}}>{text}</Text>
       </View>
     )
   }
@@ -246,13 +207,13 @@ export default class Home extends React.Component{
           <View style={{display:'flex',flexDirection:'row'}}>
             <LineChart
                 data={{
-                  labels: this.state.dateAbbreviations ? this.state.dateAbbreviations : ["January", "February", "March", "April", "May", "June"],
+                  labels: this.state.last7Days ? this.state.last7Days.map((item)=>`${item.day}-${item.month}`) : ["January", "February", "March", "April", "May", "June"],
                   datasets: [
                     {
-                      data: this.state.weeksPositives ? this.state.weeksPositives : [
-                        Math.random() * 100,
-                        Math.random() * 100,
-                        Math.random() * 100,
+                      data: this.state.last7Days ? this.state.last7Days.map((item)=>item.totalPositive) : [
+                        4,
+                        16,
+                        256,
                       ]
                     }
                   ]
@@ -278,13 +239,13 @@ export default class Home extends React.Component{
                     stroke: "#ffa726"
                   }
                 }}
-                bezier
+
                 style={{
                   marginVertical: 8,
                   borderRadius: 16
                 }}
               />
-          </View>          
+          </View>
 
           {this.getLicensePlateCard(canDriveToday,dayOfWeek)}
 
