@@ -117,11 +117,7 @@ export default class Home extends React.Component{
       deaths:data.deaths,
       negativeCases:data.negativeCases,
       testsInProgress:data.testsInProgress,
-      month:data.month,
-      day:data.day,
-      year:data.year,
-      hour:data.hour,
-      minutes:data.minutes,
+      timestamp:data.timestamp
 
     })
     } else{
@@ -129,10 +125,8 @@ export default class Home extends React.Component{
     }
     const historicalDataRef = await firestore().doc("data/historicalData").get()
     if (historicalDataRef.exists){
-      historicalData = historicalDataRef.data()
-      last7Days = historicalData.last7Days
-      console.log("Historical data"+last7Days)
-      this.setState({last7Days:last7Days})
+      historicalData = historicalDataRef.data().all
+      this.setState({historicalData:historicalData})
     }
 
   }
@@ -199,15 +193,15 @@ export default class Home extends React.Component{
             {this.getDataBlock("data",this.state.conductedTests,0,0,0,15)}
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
-            <Text>{`Actualizado ${this.state.day}-${this.state.month}-${this.state.year}`}</Text>
+            <Text>{`Actualizado ${this.state.timestamp ? this.state.timestamp : ""}`}</Text>
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
             <LineChart
                 data={{
-                  labels: this.state.last7Days ? this.state.last7Days.map((item)=>`${item.day}-${item.month}`) : ["January", "February", "March", "April", "May", "June"],
+                  labels: this.state.historicalData ? this.state.historicalData.map((item)=>`${(new Date(item.timestamp)).getDate()}-${(new Date(item.timestamp)).getMonth() + 1}`) : ["January", "February", "March", "April", "May", "June"],
                   datasets: [
                     {
-                      data: this.state.last7Days ? this.state.last7Days.map((item)=>item.confirmedCases) : [
+                      data: this.state.historicalData ? this.state.historicalData.map((item)=>item.confirmedCases) : [
                         4,
                         16,
                         256,

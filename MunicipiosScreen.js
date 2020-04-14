@@ -73,6 +73,7 @@ export default class Municipios extends React.Component{
     const municipiosRef = await firestore().doc("data/municipios").get() //().collection('data')
     if (municipiosRef.exists){
       municipiosData = municipiosRef.data()
+      console.log("municipiosData",municipiosData)
       this.setState({municipioDataToday:municipiosData})
     }
 
