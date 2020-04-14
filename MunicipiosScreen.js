@@ -7,34 +7,7 @@ import {
   ScrollView
 } from 'react-native';
 
-
-// import {getTwoDigitNumber,getLastXDaysCode} from './HomeScreen'
-
-DATA_LAG_DAYS = 3
-function getTwoDigitNumber(number){
-  if (number < 10){
-    return `0${number}`
-  }
-}
-
-function getLastXDaysCode(numDays){
-  days = []
-  for (var i = 0; i < numDays; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() - (i+DATA_LAG_DAYS));
-    console.log(`${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`)
-    days.push({month:d.getMonth()+1,day:d.getDate(),year:d.getFullYear()})
-  }
-  return days
-
-}
-
-
-
-
-import RNFetchBlob from 'rn-fetch-blob'
-const COVID_DATA_URL_PREFIX = "https://raw.githubusercontent.com/Code4PuertoRico/covid19-pr-api/master/data/PuertoRicoTaskForce/"
-const MUNICIPIOS_CSV_SUFFIX = "/CSV/municipios.csv"
+import firestore from '@react-native-firebase/firestore';
 
 
 const SCROLLVIEW_MARGIN = 5
@@ -77,13 +50,11 @@ function getMunicipiosRowsWithData(municipios){
     // const cellColor
     // // if municipio.totalCases >= 30
 
-
     var rowContent = (
       <View key={municipio} style={{display:'flex',flexDirection:'row'}}>
         {getCell(municipio)}
-        {getCell(municipios[municipio].totalCases)}
+        {getCell(municipios[municipio].confirmedCases)}
       </View>
-
     )
     allContent.push(rowContent)
 
@@ -98,65 +69,18 @@ export default class Municipios extends React.Component{
     this.state = {municipioDataToday:[]}
   }
 
-
-  getMunicipioDataForLastXDays = async (numDays) =>{
-    const days = getLastXDaysCode(numDays)
-    var dataForDays = []
-    for (var i = 0; i < days.length; i++) {
-      dataForDays.push(this.getMunicipioDataForDay(days[i]))
-    }
-    return Promise.all(dataForDays)
-  }
-
-
-    getMunicipioDataForDay = async (dayObject) =>{
-
-      const day = getTwoDigitNumber(dayObject.day)
-      const month = dayObject.month
-      const year = dayObject.year
-
-      const url = COVID_DATA_URL_PREFIX+`${month}-${day}-${year}` + MUNICIPIOS_CSV_SUFFIX
-      return RNFetchBlob.fetch('GET',url).then(data=>{
-        let text = data.text()
-        // console.log(`Text is \n${text}`)
-        var rowsText = text.split("\"").join("")
-        var rows = rowsText.split("\n")
-        for (var i = 0; i < rows.length; i++) {
-          rows[i] = rows[i].split(",")
-        }
-        municipios = {}
-        MUNICIPIOS_START_i = 2 // There is no + 78 right bound, since we do not have data for all 78 municipalities
-        MUNICIPIO_NAME_i = 0
-        MUNICIPIO_CASES_i = 1
-        for (var i = MUNICIPIOS_START_i; i < rows.length; i++) {
-          const row = rows[i]
-          // console.log(`Municipio row: ${row}`)
-          const name = row[MUNICIPIO_NAME_i]
-          const caseNumber = row[MUNICIPIO_CASES_i]
-          dataForMunicipio = {name:name,totalCases:caseNumber}
-          municipios[name] = dataForMunicipio
-        }
-        return {...dayObject,municipiosData:municipios}
-      })
-      .catch(error=>{
-        console.log(`Error retrieving municipios data: for ${day}` +error)
-      })
-
-    }
-
-
   loadMunicipiosData = async () =>{
-    const municipioDataForLastXDays = await this.getMunicipioDataForLastXDays(1)
-    const todaysMunicipiosData = municipioDataForLastXDays[0].municipiosData
-    this.setState({municipioDataToday:todaysMunicipiosData})
+    const municipiosRef = await firestore().doc("data/municipios").get() //().collection('data')
+    if (municipiosRef.exists){
+      municipiosData = municipiosRef.data()
+      this.setState({municipioDataToday:municipiosData})
+    }
 
   }
 
   async componentDidMount (){
     this.loadMunicipiosData()
-
   }
-
 
   render (){
     return (

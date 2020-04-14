@@ -110,7 +110,7 @@ export default class Home extends React.Component{
     const covidData = await firestore().doc("data/todaysData").get() //().collection('data')
     if (covidData.exists){
       data = covidData.data()
-      console.log("DATA IS\n",dataObject)
+      console.log("DATA IS\n",data)
       this.setState({
       conductedTests:data.conductedTests,
       confirmedCases:data.confirmedCases,
