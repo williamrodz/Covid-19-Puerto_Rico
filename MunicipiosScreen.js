@@ -30,6 +30,7 @@ function getMunicipiosRowsWithData(municipios){
   const allContent = []
 
   const municipioNames = Object.keys(municipios)
+  var lastRow = undefined
   for (var i = 0; i < municipioNames.length; i++) {
 
     if (i==0){
@@ -43,6 +44,12 @@ function getMunicipiosRowsWithData(municipios){
 
 
     const municipio = municipioNames[i]
+    if (municipio.indexOf("No disponible") != -1){
+      municipioDisplayName = "No disponible"
+    } else {
+      municipioDisplayName = municipio
+    }
+
     const borderTopLeftRadius = i == 0 ? 15 : 0
     const borderTopRightRadius = i == 0 ? 15 : 0
     const borderBottomLeftRadius = i == municipioNames.length - 1 ? 15 : 0
@@ -51,14 +58,19 @@ function getMunicipiosRowsWithData(municipios){
     // // if municipio.totalCases >= 30
 
     var rowContent = (
-      <View key={municipio} style={{display:'flex',flexDirection:'row'}}>
-        {getCell(municipio)}
+      <View key={municipioDisplayName} style={{display:'flex',flexDirection:'row'}}>
+        {getCell(municipioDisplayName)}
         {getCell(municipios[municipio].confirmedCases)}
       </View>
     )
-    allContent.push(rowContent)
+    if (municipio.indexOf("No disponible") != -1){
+      lastRow = rowContent
+    } else{
+      allContent.push(rowContent)
+    }
 
   }
+  allContent.push(lastRow)
   return allContent
 
 }
@@ -74,7 +86,7 @@ export default class Municipios extends React.Component{
     if (municipiosRef.exists){
       municipiosData = municipiosRef.data()
       console.log("municipiosData",municipiosData)
-      this.setState({municipioDataToday:municipiosData})
+      this.setState({municipioDataToday:municipiosData.all})
     }
 
   }
