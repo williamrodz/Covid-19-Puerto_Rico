@@ -155,7 +155,6 @@ export default class Home extends React.Component{
       </View>
     )
   }
-
   render(){
     var currentDate = new Date()
     const dayOfWeek = currentDate.getDay()

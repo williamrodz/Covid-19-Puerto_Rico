@@ -23,6 +23,8 @@ Icon.loadFont()
 import HomeScreen from './HomeScreen'
 import SettingsScreen from './SettingsScreen'
 import MunicipiosScreen from './MunicipiosScreen'
+import ResourcesScreen from './ResourcesScreen'
+
 
 
 const Tab = createBottomTabNavigator();
@@ -44,6 +46,11 @@ export default class MyTabs extends React.Component {
             <Icon name="home" size={size} color={color} />
           )}} />
           <Tab.Screen name="Municipios" component={MunicipiosScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+            <Icon name="navicon" size={size} color={color} />
+          )}} />
+          <Tab.Screen name="Recursos" component={ResourcesScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
             <Icon name="navicon" size={size} color={color} />
