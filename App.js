@@ -53,18 +53,16 @@ export default class MyTabs extends React.Component {
           <Tab.Screen name="Recursos" component={ResourcesScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
-            <Icon name="navicon" size={size} color={color} />
-          )}} />
-          <Tab.Screen name="Settings" component={SettingsScreen}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-            <Icon name="gear" size={size} color={color} />
+            <Icon name="book" size={size} color={color} />
           )}} />
         </Tab.Navigator>
       </NavigationContainer>
-
     );
-
+    // <Tab.Screen name="Settings" component={SettingsScreen}
+    // options={{
+    //   tabBarIcon: ({ color, size }) => (
+    //   <Icon name="gear" size={size} color={color} />
+    // )}} />
   }
 
 }

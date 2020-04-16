@@ -168,10 +168,10 @@ export default class Home extends React.Component{
     }
 
     return (
-      <SafeAreaView style={{...StyleSheet.absoluteFillObject,display:'flex',flexDirection: 'column', alignItems:'center',justifyContent:'center'}}>
+      <SafeAreaView style={{...StyleSheet.absoluteFillObject}}>
         <ScrollView contentContainerStyle={{flexGrow:1,display:'flex',flexDirection:'column',alignItems: 'center',margin:SCROLLVIEW_MARGIN,backgroundColor:BACKGROUND_COLOR}}>
 
-          <View style={{display:'flex',flexDirection:'row'}}>
+          <View style={{display:'flex',flexDirection:'row',paddingTop: 20}}>
             {this.getDataBlock("label","Casos positivos",15)}
             {this.getDataBlock("label","Casos negativos")}
             {this.getDataBlock("label","Muertes",0,15)}
@@ -182,7 +182,7 @@ export default class Home extends React.Component{
             {this.getDataBlock("data",this.state.deaths,0,0,0,15)}
           </View>
 
-          <View style={{display:'flex',flexDirection:'row'}}>
+          <View style={{display:'flex',flexDirection:'row',paddingTop: 5}}>
             {this.getDataBlock("label","Pruebas en proceso",15)}
             {this.getDataBlock("label","Pruebas realizadas",0,15)}
           </View>
@@ -235,7 +235,6 @@ export default class Home extends React.Component{
                 }}
               />
           </View>
-
           {this.getLicensePlateCard(canDriveToday,dayOfWeek)}
 
         </ScrollView>
