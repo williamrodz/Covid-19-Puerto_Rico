@@ -74,6 +74,12 @@ function getTwoDigitNumber(number){
   }
 }
 
+function getPercent(amount,total,decimals){
+  quotient = amount / total * 100
+  return quotient.toFixed(decimals) + '%'
+
+}
+
 export default class Home extends React.Component{
   constructor(props){
     super(props)
@@ -182,6 +188,17 @@ export default class Home extends React.Component{
             {this.getDataBlock("data",this.state.deaths,0,0,0,15)}
           </View>
 
+          <View style={{display:'flex',flexDirection:'row',paddingTop: 20}}>
+            {this.getDataBlock("label","Porciento Positivo",15)}
+            {this.getDataBlock("label","Pociento Negativo")}
+            {this.getDataBlock("label","Porciento de muertes",0,15)}
+          </View>
+          <View style={{display:'flex',flexDirection:'row'}}>
+            {this.getDataBlock("data",getPercent(this.state.confirmedCases,this.state.conductedTests,1),0,0,15)}
+            {this.getDataBlock("data",getPercent(this.state.negativeCases,this.state.conductedTests,1))}
+            {this.getDataBlock("data",getPercent(this.state.deaths,this.state.conductedTests,3),0,0,0,15)}
+          </View>
+
           <View style={{display:'flex',flexDirection:'row',paddingTop: 5}}>
             {this.getDataBlock("label","Pruebas en proceso",15)}
             {this.getDataBlock("label","Pruebas realizadas",0,15)}
@@ -235,10 +252,9 @@ export default class Home extends React.Component{
                 }}
               />
           </View>
-          {this.getLicensePlateCard(canDriveToday,dayOfWeek)}
-
         </ScrollView>
       </SafeAreaView>
       )
   }
+  // {this.getLicensePlateCard(canDriveToday,dayOfWeek)}
 }
