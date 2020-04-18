@@ -18,7 +18,8 @@ import {
   Text,
   Button,
   SafeAreaView,
-  ScrollView
+  ScrollView,
+  RefreshControl,
 } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -80,6 +81,27 @@ function getPercent(amount,total,decimals){
 
 }
 
+function getDataBlock(blockType,text,borderTopLeftRadius=0,borderTopRightRadius=0,borderBottomLeftRadius=0,borderBottomRightRadius=0){
+  if (blockType == "label"){
+    backgroundColor = DATA_LABEL_BACKGROUND_COLOR
+    fontSize = LABEL_FONT_SIZE
+    fontColor = DATA_VALUE_TEXT_COLOR
+  }
+  else if (blockType == "data"){
+    backgroundColor = DATA_VALUE_BACKGROUND_COLOR
+    fontSize = DATA_FONT_SIZE
+    fontColor = "black"
+  }
+  return (
+    <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT,
+      borderTopLeftRadius: borderTopLeftRadius,borderTopRightRadius:borderTopRightRadius,borderBottomLeftRadius: borderBottomLeftRadius,borderBottomRightRadius:borderBottomRightRadius,
+      backgroundColor: backgroundColor,
+      alignItems:'center',justifyContent:'center'}}>
+      <Text style={{textAlign: 'center',fontSize:fontSize,color: fontColor}}>{text}</Text>
+    </View>
+  )
+}
+
 export default class Home extends React.Component{
   constructor(props){
     super(props)
@@ -138,30 +160,19 @@ export default class Home extends React.Component{
   }
 
   async componentDidMount (){
-    this.loadCOVID19Data()
+    await this.loadCOVID19Data()
   }
 
-  getDataBlock(blockType,text,borderTopLeftRadius=0,borderTopRightRadius=0,borderBottomLeftRadius=0,borderBottomRightRadius=0){
-    if (blockType == "label"){
-      backgroundColor = DATA_LABEL_BACKGROUND_COLOR
-      fontSize = LABEL_FONT_SIZE
-      fontColor = DATA_VALUE_TEXT_COLOR
-    }
-    else if (blockType == "data"){
-      backgroundColor = DATA_VALUE_BACKGROUND_COLOR
-      fontSize = DATA_FONT_SIZE
-      fontColor = "black"
-    }
-    return (
-      <View style={{width: BLOCK_WIDTH, height: BLOCK_HEIGHT,
-        borderTopLeftRadius: borderTopLeftRadius,borderTopRightRadius:borderTopRightRadius,borderBottomLeftRadius: borderBottomLeftRadius,borderBottomRightRadius:borderBottomRightRadius,
-        backgroundColor: backgroundColor,
-        alignItems:'center',justifyContent:'center'}}>
-        <Text style={{textAlign: 'center',fontSize:fontSize,color: fontColor}}>{text}</Text>
-      </View>
-    )
+  _onRefresh = () => {
+    console.log("REFRESHING")
+    this.setState({refreshing: true});
+    this.loadCOVID19Data().then(() => {
+      this.setState({refreshing: false});
+    });
   }
+
   render(){
+
     var currentDate = new Date()
     const dayOfWeek = currentDate.getDay()
 
@@ -175,38 +186,42 @@ export default class Home extends React.Component{
 
     return (
       <SafeAreaView style={{...StyleSheet.absoluteFillObject}}>
-        <ScrollView contentContainerStyle={{flexGrow:1,display:'flex',flexDirection:'column',alignItems: 'center',margin:SCROLLVIEW_MARGIN,backgroundColor:BACKGROUND_COLOR}}>
+        <ScrollView contentContainerStyle={{flexGrow:1,display:'flex',flexDirection:'column',alignItems: 'center',margin:SCROLLVIEW_MARGIN,backgroundColor:BACKGROUND_COLOR}}
+        refreshControl={
+           <RefreshControl refreshing={this.state.refreshing} onRefresh={()=>this._onRefresh()} />
+         }
+        >
 
           <View style={{display:'flex',flexDirection:'row',paddingTop: 20}}>
-            {this.getDataBlock("label","Casos positivos",15)}
-            {this.getDataBlock("label","Casos negativos")}
-            {this.getDataBlock("label","Muertes",0,15)}
+            {getDataBlock("label","Casos positivos",15)}
+            {getDataBlock("label","Casos negativos")}
+            {getDataBlock("label","Muertes",0,15)}
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
-            {this.getDataBlock("data",this.state.confirmedCases,0,0,15)}
-            {this.getDataBlock("data",this.state.negativeCases)}
-            {this.getDataBlock("data",this.state.deaths,0,0,0,15)}
+            {getDataBlock("data",this.state.confirmedCases,0,0,15)}
+            {getDataBlock("data",this.state.negativeCases)}
+            {getDataBlock("data",this.state.deaths,0,0,0,15)}
           </View>
 
-          <View style={{display:'flex',flexDirection:'row',paddingTop: 20}}>
-            {this.getDataBlock("label","Porciento Positivo",15)}
-            {this.getDataBlock("label","Pociento Negativo")}
-            {this.getDataBlock("label","Porciento de muertes",0,15)}
+          <View style={{display:'flex',flexDirection:'row',paddingTop: 10}}>
+            {getDataBlock("label","Porciento Positivo",15)}
+            {getDataBlock("label","Porciento Negativo")}
+            {getDataBlock("label","Porciento de muertes",0,15)}
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
-            {this.getDataBlock("data",getPercent(this.state.confirmedCases,this.state.conductedTests,1),0,0,15)}
-            {this.getDataBlock("data",getPercent(this.state.negativeCases,this.state.conductedTests,1))}
-            {this.getDataBlock("data",getPercent(this.state.deaths,this.state.conductedTests,3),0,0,0,15)}
+            {getDataBlock("data",getPercent(this.state.confirmedCases,this.state.conductedTests,1),0,0,15)}
+            {getDataBlock("data",getPercent(this.state.negativeCases,this.state.conductedTests,1))}
+            {getDataBlock("data",getPercent(this.state.deaths,this.state.conductedTests,3),0,0,0,15)}
           </View>
 
-          <View style={{display:'flex',flexDirection:'row',paddingTop: 5}}>
-            {this.getDataBlock("label","Pruebas en proceso",15)}
-            {this.getDataBlock("label","Pruebas realizadas",0,15)}
+          <View style={{display:'flex',flexDirection:'row',paddingTop: 10}}>
+            {getDataBlock("label","Pruebas en proceso",15)}
+            {getDataBlock("label","Pruebas realizadas",0,15)}
           </View>
 
           <View style={{display:'flex',flexDirection:'row'}}>
-            {this.getDataBlock("data",this.state.testsInProgress,0,0,15)}
-            {this.getDataBlock("data",this.state.conductedTests,0,0,0,15)}
+            {getDataBlock("data",this.state.testsInProgress,0,0,15)}
+            {getDataBlock("data",this.state.conductedTests,0,0,0,15)}
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
             <Text>{`Actualizado ${this.state.timestamp ? this.state.timestamp : ""}`}</Text>

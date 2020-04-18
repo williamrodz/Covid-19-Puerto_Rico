@@ -4,7 +4,8 @@ import {
   View,
   Text,
   SafeAreaView,
-  ScrollView
+  ScrollView,
+  RefreshControl
 } from 'react-native';
 
 import firestore from '@react-native-firebase/firestore';
@@ -65,7 +66,11 @@ function getMunicipiosRowsWithData(municipios){
     )
     if (municipio.indexOf("No disponible") != -1){
       lastRow = rowContent
-    } else{
+    }
+    else if (municipio.indexOf("timestamp") != -1){
+      continue
+    }
+    else{
       allContent.push(rowContent)
     }
 
@@ -79,6 +84,14 @@ export default class Municipios extends React.Component{
   constructor(props){
     super(props)
     this.state = {municipioDataToday:[]}
+  }
+
+  _onRefresh = () => {
+    console.log("REFRESHING")
+    this.setState({refreshing: true});
+    this.loadMunicipiosData().then(() => {
+      this.setState({refreshing: false});
+    });
   }
 
   loadMunicipiosData = async () =>{
@@ -98,7 +111,12 @@ export default class Municipios extends React.Component{
   render (){
     return (
       <SafeAreaView style={{...StyleSheet.absoluteFillObject,display:'flex',flexDirection: 'column', alignItems:'stretch',justifyContent:'center'}}>
-        <ScrollView contentContainerStyle={{flexGrow:1,display:'flex',flexDirection:'column',alignItems: 'center',margin:SCROLLVIEW_MARGIN}}>
+        <ScrollView contentContainerStyle={{flexGrow:1,display:'flex',flexDirection:'column',alignItems: 'center',margin:SCROLLVIEW_MARGIN}}
+        refreshControl={
+           <RefreshControl refreshing={this.state.refreshing} onRefresh={()=>this._onRefresh()} />
+         }
+        >
+
           <View style={{display: "flex",flexDirection: 'column'}}>
             {this.state.municipioDataToday ? getMunicipiosRowsWithData(this.state.municipioDataToday) : <Text>Hi</Text>}
           </View>
