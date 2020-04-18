@@ -39,7 +39,7 @@ const DATA_VALUE_TEXT_COLOR = "white"
 const DATA_LABEL_BACKGROUND_COLOR = "#8e44ad"
 const BACKGROUND_COLOR = "#bdc3c7"
 
-const LABEL_FONT_SIZE = 15
+const LABEL_FONT_SIZE = 18.5
 const DATA_FONT_SIZE = 24
 
 const DAYS_FOR_EVEN_PLATES = {1:true,3:true,5:true}
@@ -145,7 +145,8 @@ export default class Home extends React.Component{
       deaths:data.deaths,
       negativeCases:data.negativeCases,
       testsInProgress:data.testsInProgress,
-      timestamp:data.timestamp
+      timestamp:data.timestamp,
+      saludTimeSignature:data.saludTimeSignature,
 
     })
     } else{
@@ -192,7 +193,10 @@ export default class Home extends React.Component{
          }
         >
 
-          <View style={{display:'flex',flexDirection:'row',paddingTop: 20}}>
+          <View style={{display:'flex',flexDirection:'row',paddingTop: 2}}>
+            <Text style={{fontSize: 30,fontWeight: 'bold',textAlign:'center'}}>{"COVID-19 en\n Puerto Rico🇵🇷"}</Text>
+          </View>
+          <View style={{display:'flex',flexDirection:'row',paddingTop: 5}}>
             {getDataBlock("label","Casos positivos",15)}
             {getDataBlock("label","Casos negativos")}
             {getDataBlock("label","Muertes",0,15)}
@@ -224,7 +228,7 @@ export default class Home extends React.Component{
             {getDataBlock("data",this.state.conductedTests,0,0,0,15)}
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
-            <Text>{`Actualizado ${this.state.timestamp ? this.state.timestamp : ""}`}</Text>
+            <Text>{`${this.state.saludTimeSignature ? this.state.saludTimeSignature.replace("\n","") : ""}`}</Text>
           </View>
           <View style={{display:'flex',flexDirection:'row'}}>
             <LineChart

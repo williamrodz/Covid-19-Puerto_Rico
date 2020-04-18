@@ -81,7 +81,7 @@ export default class Recursos extends React.Component{
         left: blockSide=="left" ? 0 : 10,
         right: blockSide=="left" ? 10 : 0,
         justifyContent: 'center',alignItems: 'center'}}>
-        <Text style={{color:"white",fontSize: 100}}>😷</Text>
+        <Text style={{color:"white",fontSize: 30,alignItems: 'center',textAlign: 'center'}}>{text}</Text>
       </TouchableOpacity>
 
     )
@@ -93,7 +93,7 @@ export default class Recursos extends React.Component{
           <TouchableOpacity
             onPress={onPressFunction}
             style={{display:'flex',flexDirection:'row',
-            width:250,height: 70,
+            width:300,height: 70,
             top: 10,
             borderRadius: 15,
             alignItems: 'center',justifyContent: "center",
@@ -102,7 +102,7 @@ export default class Recursos extends React.Component{
               <Icon name={iconName} size={40} color={"white"} />
             </View>
             <View style={{width:"70%"}}>
-              <Text style={{fontSize: 20,color:"white",textAlign: 'center'}}>{text}</Text>
+              <Text style={{fontSize: 20,color:"white",textAlign: 'center',fontWeight: 'bold'}}>{text}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -114,8 +114,8 @@ export default class Recursos extends React.Component{
       <SafeAreaView style={{...StyleSheet.absoluteFillObject,flex:1,flexDirection: 'column',}}>
         <ScrollView contentContainerStyle={{flexGrow:1,flexDirection:'column',alignItems: 'center',}}>
           <View style={{display:'flex',flexDirection:'row', justifyContent: 'space-between',padding: 10}}>
-            {this.getExternalResourceBlock("PR symptoms","left",()=>InAppBrowser.open(PR_SALUD_SYMPTOMS_LINK))}
-            {this.getExternalResourceBlock("CDC symptoms","right",()=>InAppBrowser.open(CDC_SYMPTOMS_LINK))}
+            {this.getExternalResourceBlock("Dept Salud PR","left",()=>InAppBrowser.open(PR_SALUD_SYMPTOMS_LINK))}
+            {this.getExternalResourceBlock("CDC","right",()=>InAppBrowser.open(CDC_SYMPTOMS_LINK))}
           </View>
           <View style={{display:'flex',flexDirection:'row', justifyContent: 'space-between'}}>
             {this.getExternalResourceBlock("Al salir de la casa","left",()=>InAppBrowser.open("http://www.salud.gov.pr/PublishingImages/Pages/coronavirus/Al%20salir%20de%20casa.png"))}
@@ -127,7 +127,7 @@ export default class Recursos extends React.Component{
             <TouchableOpacity
               onPress={()=>Linking.openURL(`tel:${SALUD_PHONE_NUMBER}`)}
               style={{display:'flex',flexDirection:'row',
-              width:250,height: 70,
+              width:300,height: 70,
               top: 10,
               borderRadius: 15,
               alignItems: 'center',justifyContent: "center",
@@ -136,8 +136,8 @@ export default class Recursos extends React.Component{
                 <Icon name={"phone"} size={40} color={"white"} />
               </View>
               <View style={{width:"70%"}}>
-                <Text style={{fontSize: 16,color:"white",textAlign: 'center'}}>{"Departamento de Salud"}</Text>
-                <Text style={{fontSize: 20,color:"white",textAlign: 'center'}}>{SALUD_PHONE_NUMBER}</Text>
+                <Text style={{fontSize: 16,color:"white",textAlign: 'center',fontWeight: 'bold'}}>{"Departamento de Salud"}</Text>
+                <Text style={{fontSize: 20,color:"white",textAlign: 'center',fontWeight: 'bold'}}>{SALUD_PHONE_NUMBER}</Text>
 
               </View>
             </TouchableOpacity>

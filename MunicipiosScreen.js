@@ -12,22 +12,24 @@ import firestore from '@react-native-firebase/firestore';
 
 
 const SCROLLVIEW_MARGIN = 5
-const MUNICIPIO_BLOCK_WIDTH = 125
-const MUNICIPIO_BLOCK_HEIGHT = 40
+const MUNICIPIO_BLOCK_WIDTH = 150
+const MUNICIPIO_BLOCK_HEIGHT = 50
 
-function getCell(text,backgroundColor="ghostwhite",borderTopLeftRadius=0,borderTopRightRadius=0,borderBottomLeftRadius=0,borderBottomRightRadius=0, width=MUNICIPIO_BLOCK_WIDTH,height=MUNICIPIO_BLOCK_HEIGHT,borderWidth=1,borderColor='black'){
+function getCell(text,backgroundColor="ghostwhite",isLeftCell, width=MUNICIPIO_BLOCK_WIDTH,height=MUNICIPIO_BLOCK_HEIGHT,borderWidth=0,borderColor='silver'){
   return (
     <View style={{borderColor: borderColor, borderWidth: borderWidth,
-      borderTopLeftRadius: borderTopLeftRadius,borderTopRightRadius: borderTopRightRadius,borderBottomLeftRadius: borderBottomLeftRadius, borderBottomRightRadius: borderBottomRightRadius,
+      borderTopLeftRadius: isLeftCell ? 15 : 0,borderTopRightRadius: isLeftCell ? 0 : 15,borderBottomLeftRadius: isLeftCell ? 15 : 0, borderBottomRightRadius: isLeftCell ? 0 : 15,
+      borderTopWidth: 0.25,borderBottomWidth: 0.25,
+      borderLeftWidth: isLeftCell ? 1 : 0, borderRightWidth: isLeftCell ? 0 : 1,
       width: width, height: height, backgroundColor: backgroundColor,
       alignItems:'center',justifyContent:'center'}}>
-      <Text style={{fontSize: 15}}>{text}</Text>
+      <Text style={{fontSize: 20,}}>{text}</Text>
     </View>
   )
 }
 
 
-function getMunicipiosRowsWithData(municipios){
+function getMunicipiosRowsWithData(municipios,totalCountedByMunicipio){
   const allContent = []
 
   const municipioNames = Object.keys(municipios)
@@ -37,8 +39,8 @@ function getMunicipiosRowsWithData(municipios){
     if (i==0){
       allContent.push(
         <View key={"header"} style={{display:'flex',flexDirection:'row'}}>
-          {getCell("Municipio","gold",15)}
-          {getCell("Casos Positivos","gold",0,15)}
+          {getCell("Municipio","gold",true)}
+          {getCell("Casos Positivos","gold",false)}
         </View>
       )
     }
@@ -57,11 +59,13 @@ function getMunicipiosRowsWithData(municipios){
     const borderBottomRightRadius = i == municipioNames.length - 1 ? 15 : 0
     // const cellColor
     // // if municipio.totalCases >= 30
-
+    var portion = (municipios[municipio].confirmedCases / totalCountedByMunicipio)
+    var coeff = (50 * portion)
+    // var color  = "white"
     var rowContent = (
       <View key={municipioDisplayName} style={{display:'flex',flexDirection:'row'}}>
-        {getCell(municipioDisplayName)}
-        {getCell(municipios[municipio].confirmedCases)}
+        {getCell(municipioDisplayName,`hsl(6, 50%, ${95 - coeff}%)`,true)}
+        {getCell(municipios[municipio].confirmedCases,`hsl(6, 50%, ${95 - coeff}%)`,false)}
       </View>
     )
     if (municipio.indexOf("No disponible") != -1){
@@ -97,11 +101,19 @@ export default class Municipios extends React.Component{
   loadMunicipiosData = async () =>{
     const municipiosRef = await firestore().doc("data/municipios").get() //().collection('data')
     if (municipiosRef.exists){
-      municipiosData = municipiosRef.data()
-      console.log("municipiosData",municipiosData)
-      this.setState({municipioDataToday:municipiosData.all})
-    }
+      municipiosData = municipiosRef.data().all
+      municipios = Object.keys(municipiosData)
+      var totalCountedByMunicipio = 0
+      for (var i = 0; i < municipios.length; i++) {
+        municipio = municipios[i]
 
+        if (municipio.indexOf("No disponible")== -1 && municipio.indexOf("timestamp")== -1){
+          totalCountedByMunicipio += municipiosData[municipio].confirmedCases
+        }
+      }
+      console.log(`TOTAL: ${totalCountedByMunicipio}`)
+      this.setState({municipioDataToday:municipiosData,totalCountedByMunicipio:totalCountedByMunicipio})
+    }
   }
 
   async componentDidMount (){
@@ -116,9 +128,8 @@ export default class Municipios extends React.Component{
            <RefreshControl refreshing={this.state.refreshing} onRefresh={()=>this._onRefresh()} />
          }
         >
-
-          <View style={{display: "flex",flexDirection: 'column'}}>
-            {this.state.municipioDataToday ? getMunicipiosRowsWithData(this.state.municipioDataToday) : <Text>Hi</Text>}
+          <View style={{display: "flex",flexDirection: 'column',}}>
+            {this.state.municipioDataToday ? getMunicipiosRowsWithData(this.state.municipioDataToday,this.state.totalCountedByMunicipio) : <Text>Hi</Text>}
           </View>
         </ScrollView>
       </SafeAreaView>
